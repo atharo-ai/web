@@ -2,10 +2,10 @@ version: 1
 name: Atharo Weather Demo
 description: A demo of Atharo that gets the weather
 commands:
-  - name: weather
-    entry: weather.ts
+  weather:
     description: Get the current weather in a given location
-    example: "What's the weather like in San Diego?"
+    example: What's the weather like in San Diego?
+    entry: weather.ts
     parameters:
       - name: location
         description: The location to get the weather for
@@ -18,10 +18,10 @@ commands:
         options:
           - celsius
           - fahrenheit
-  - name: rain
-    entry: rain.ts
+  rain_chance:
     description: Get the current chance of rain in a given location
-    example: "What's the chance of rain in San Diego?"
+    example: What's the chance of rain in San Diego?
+    entry: rain.ts
     parameters:
       - name: location
         description: The location to get the chance of rain for
