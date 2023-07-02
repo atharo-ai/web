@@ -1,0 +1,29 @@
+version: 1
+name: Atharo Weather Demo
+description: A demo of Atharo that gets the weather
+commands:
+  - name: weather
+    entry: weather.ts
+    description: Get the current weather in a given location
+    example: "What's the weather like in San Diego?"
+    parameters:
+      - name: location
+        description: The location to get the weather for
+        type: string
+        required: true
+      - name: unit
+        description: The unit to use for the temperature
+        type: string
+        required: false
+        options:
+          - celsius
+          - fahrenheit
+  - name: rain
+    entry: rain.ts
+    description: Get the current chance of rain in a given location
+    example: "What's the chance of rain in San Diego?"
+    parameters:
+      - name: location
+        description: The location to get the chance of rain for
+        type: string
+        required: true
