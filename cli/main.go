@@ -1,7 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"atharo.com/cli/cmd"
+)
 
 func main() {
-	fmt.Println("Hello world")
+	cmd.Execute()
 }
