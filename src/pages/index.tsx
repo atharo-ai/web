@@ -1,16 +1,17 @@
 import { Button, Switch, TextInput } from "@mantine/core";
 import { signIn, signOut, useSession } from "next-auth/react";
-import Head from "next/head";
 import Link from "next/link";
+import { useState } from "react";
 import { Page } from "~/components/Page";
 import { api } from "~/utils/api";
 
 export default function Home() {
-  const hello = api.example.hello.useQuery({ text: "from tRPC" });
+  const message = api.chatCompletion.message.useQuery({ text: "from tRPC" });
 
+  const [weatherPlugin, setWeatherPlugin] = useState(false);
   return (
     <Page>
-      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#026d47] to-[#152c29]">
+      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#02496d] to-[#15292c]">
         <div className="flex h-screen w-screen max-w-screen-xl flex-col justify-center gap-6 px-4 py-16 ">
           <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
             Atharo.
@@ -18,7 +19,11 @@ export default function Home() {
           <div className="flex w-full flex-1 gap-4">
             <div className="relative flex flex-1 flex-col p-4">
               <div className="absolute bottom-0 left-0 right-0 top-0 rounded-lg bg-black opacity-40" />
-              <div className="flex-1"></div>
+              <div className="z-10 flex-1">
+                <div className="rounded bg-white p-4 text-black">
+                  {message?.data?.message}
+                </div>
+              </div>
               <div className="flex">
                 <TextInput className="mr-4 flex-1" />
                 <Button>Send</Button>
@@ -34,7 +39,11 @@ export default function Home() {
                     Get the current weather in a given location
                   </div>
                   <div>
-                    <Switch label="Enable" />
+                    <Switch
+                      value={weatherPlugin ? 1 : 0}
+                      onChange={() => setWeatherPlugin((v) => !v)}
+                      label={weatherPlugin ? "Enabled" : "Disabled"}
+                    />
                   </div>
                 </div>
               </div>
