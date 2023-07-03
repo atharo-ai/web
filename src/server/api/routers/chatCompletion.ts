@@ -11,7 +11,7 @@ export const chatCompletionRouter = createTRPCRouter({
       try {
         result = await chatCompletion();
       } catch (e) {
-        console.error(e?.response);
+        console.error(e?.response || e);
       }
       return {
         message: result?.data?.choices?.[0]?.message?.content,
