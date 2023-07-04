@@ -15,14 +15,15 @@ const chatCompletion = async () => {
     {
       role: "system",
       content: `
-          Your name is Atharo, an assistant that uses plugins. You do not help with tasks beyond your plugins.
+          Your name is Atharo, an assistant that uses plugins.
+          You do not help with tasks beyond your plugins.
           Only use functions you are provided with.
           For a full list of plugins, you can visit atharo.com/plugins.
         `,
     },
     {
       role: "user",
-      content: "Hello, who are you?",
+      content: "Hello! Do you remember me?",
     },
   ];
 

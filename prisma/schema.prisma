@@ -74,7 +74,9 @@ model UserPlugins {
 
 model Plugin {
     id          String        @id @default(cuid())
-    name        String
+    safeName    String        @unique
+    title       String
+    description String
     yaml        String
     userPlugins UserPlugins[]
 }

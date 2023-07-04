@@ -6,7 +6,7 @@ type PluginDefinition = {
   id: string;
   name: string;
   description: string;
-  commands: {
+  features: {
     [key: string]: {
       description: string;
       example: string;
@@ -29,7 +29,7 @@ version: 1
 id: pluginManager
 name: Plugin Manager
 description: Manage your plugins, including installing and uninstalling.
-commands:
+features:
   list:
     description: List all available plugins
     example: What plugins do you have?
@@ -45,7 +45,7 @@ commands:
         required: true
         `) as PluginDefinition;
 
-  return Object.entries(pluginDefinition.commands).map<ChatCompletionFunctions>(
+  return Object.entries(pluginDefinition.features).map<ChatCompletionFunctions>(
     ([commandId, commandDefinition]) => ({
       name: `${pluginDefinition.id}-${commandId}`,
       description: commandDefinition.description,
