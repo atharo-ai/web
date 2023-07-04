@@ -22,7 +22,7 @@ const chatCompletion = async () => {
     },
     {
       role: "user",
-      content: "Hello, what plugins do you have?",
+      content: "Hello, who are you?",
     },
   ];
 

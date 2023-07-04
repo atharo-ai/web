@@ -103,52 +103,63 @@ const deploy = async (req: NextApiRequest, res: NextApiResponse) => {
 
     fs.writeFileSync(`./uploads/${pluginId}/main.ts`, newServerTemplate);
 
-    const newProjectResult = await fetch(
-      "https://dash.deno.com/_api/projects",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          organiztionId: process.env.ATHARO_ORGANIZATION_ID,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-          Cookie: `token=${process.env.DENO_DEPLOY_TOKEN || ""}`,
-        },
-      }
-    );
-
-    const newProject = await newProjectResult.json();
-
     const projectUniqueToken = pluginId.substr(0, 4);
-    const MAX_DENO_PROJECT_NAME = 26;
-    const MAX_PROJECT_NAME =
-      MAX_DENO_PROJECT_NAME - projectUniqueToken.length - 1;
 
-    const projectName =
-      pluginDefinition.name
-        .replace(/[^a-zA-Z0-9]/g, "")
-        .toLowerCase()
-        .substr(0, MAX_PROJECT_NAME) + `-${projectUniqueToken}`;
+    const denoProject = pluginDefinition.name
+      .replace(/[^a-zA-Z0-9]/g, "")
+      .toLowerCase();
 
-    console.log(projectName);
-
-    await fetch(
-      `https://dash.deno.com/_api/projects/${newProject.id as string}`,
+    const denoOrgResult = await fetch(
+      `https://dash.deno.com/orgs/${process.env.DENO_ORGANIZATION_ID}?_data_`,
       {
-        method: "PATCH",
-        body: JSON.stringify({
-          name: projectName,
-        }),
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
           Cookie: `token=${process.env.DENO_DEPLOY_TOKEN || ""}`,
         },
       }
     );
+
+    const denoOrg = await denoOrgResult.json();
+
+    // Creating a new project
+    if (!denoOrg?.projects?.find((p) => p.name == denoProject)) {
+      const newProjectResult = await fetch(
+        "https://dash.deno.com/_api/projects",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            organizationId: process.env.DENO_ORGANIZATION_ID,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+            Cookie: `token=${process.env.DENO_DEPLOY_TOKEN || ""}`,
+          },
+        }
+      );
+
+      const newProject = await newProjectResult.json();
+
+      await fetch(
+        `https://dash.deno.com/_api/projects/${newProject.id as string}`,
+        {
+          method: "PATCH",
+          body: JSON.stringify({
+            name: denoProject,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+            Cookie: `token=${process.env.DENO_DEPLOY_TOKEN || ""}`,
+          },
+        }
+      );
+    } else {
+      // TODO: Ensure the user owns this existing project
+    }
 
     const prc = spawn(
       "deployctl",
-      ["deploy", `--project=${projectName}`, `./main.ts`],
+      ["deploy", `--project=${denoProject}`, `./main.ts`],
       {
         cwd: `./uploads/${pluginId}`,
         env: {
@@ -167,14 +178,19 @@ const deploy = async (req: NextApiRequest, res: NextApiResponse) => {
     });
 
     prc.on("close", function (code) {
-      console.log("process exit code " + code);
+      fs.rmdirSync(`./uploads/${pluginId}`, { recursive: true });
+
+      if (code != 0) {
+        res.status(500).end({ error: "Problem deploying files" });
+        return;
+      }
+
+      res.status(200).end();
     });
 
     prc.on("error", function (err) {
       throw err;
     });
-
-    res.status(200).end();
   } catch (err: any) {
     console.error(err);
     return res

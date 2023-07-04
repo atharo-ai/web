@@ -49,19 +49,34 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
+    id            String        @id @default(cuid())
     name          String?
-    email         String?   @unique
+    email         String?       @unique
     emailVerified DateTime?
     image         String?
+    apiKey        String?       @unique @default(cuid())
     accounts      Account[]
     sessions      Session[]
+    userPlugins   UserPlugins[]
 }
 
-model Plugins {
-    id   String @id @default(cuid())
-    name String
-    yaml String
+model UserPlugins {
+    id        String  @id @default(cuid())
+    userId    String
+    pluginId  String
+    installed Boolean
+    ownership String
+    user      User    @relation(fields: [userId], references: [id])
+    plugin    Plugin  @relation(fields: [pluginId], references: [id])
+
+    @@unique([userId, pluginId])
+}
+
+model Plugin {
+    id          String        @id @default(cuid())
+    name        String
+    yaml        String
+    userPlugins UserPlugins[]
 }
 
 model VerificationToken {
